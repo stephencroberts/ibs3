@@ -11,6 +11,8 @@
 #   Create a daily scheduled task as follows:
 #     S3_BUCKET=[bucket] /usr/local/sbin/dsm_ibs3 [/absolute/path/to/directory]
 
+set -e
+
 MONTH=$(date '+%m')
 DAY=$(date '+%d')
 if [ "$MONTH" -eq "1" ] && [ "$DAY" -eq "1" ]; then
