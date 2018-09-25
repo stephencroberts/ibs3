@@ -251,6 +251,7 @@ while [[ $# -gt 0 ]]; do
     LEVEL=1
     SNAR_SRC=base
     SNAR_DST=yearly
+    shift # past argument
     ;;
     -b|--base)
     LEVEL=0
