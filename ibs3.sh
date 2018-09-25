@@ -8,6 +8,14 @@
 #
 # Usage:
 #   ibs3 [--daily | --weekly | --monthly | --yearly | --base ] [directory]
+#
+# Crons:
+#   0 0 2-6,8-13,15-20,22-27,29-31 * * S3_BUCKET=<bucket> /usr/local/sbin/ibs3
+#     --daily <directory>
+#   0 0 7,14,21,28 * * S3_BUCKET=<bucket> /usr/local/sbin/ibs3 --weekly
+#     <directory>
+#   0 0 1 2-12 * S3_BUCKET=<bucket> /usr/local/sbin/ibs3 --monthly <directory>
+#   0 0 1 1 * S3_BUCKET=<bucket> /usr/local/sbin/ibs3 --yearly <directory>
 
 # Part size for multi-part uploads (in MB)
 UPLOAD_PART_SIZE=${S3_UPLOAD_PART_SIZE:-100}
@@ -292,10 +300,26 @@ fi
 print_status "Performing a $SNAR_DST backup for $1...\n"
 
 create_archive "$SNAR_SRC" $LEVEL "$SNAR_DST" "$1" "${SNAR_DST}_${1}_${DATE}"
+
 if [ "$SNAR_DST" = "base" ]; then
   create_archive base 1 yearly "$1" "yearly_${1}_${DATE}"
   create_archive yearly 2 monthly "$1" "monthly_${1}_${DATE}"
   create_archive monthly 3 weekly "$1" "weekly_${1}_${DATE}"
+  create_archive weekly 4 daily "$1" "daily_${1}_${DATE}"
+fi
+
+if [ "$SNAR_DST" = "yearly" ]; then
+  create_archive yearly 2 monthly "$1" "monthly_${1}_${DATE}"
+  create_archive monthly 3 weekly "$1" "weekly_${1}_${DATE}"
+  create_archive weekly 4 daily "$1" "daily_${1}_${DATE}"
+fi
+
+if [ "$SNAR_DST" = "monthly" ]; then
+  create_archive monthly 3 weekly "$1" "weekly_${1}_${DATE}"
+  create_archive weekly 4 daily "$1" "daily_${1}_${DATE}"
+fi
+
+if [ "$SNAR_DST" = "weekly" ]; then
   create_archive weekly 4 daily "$1" "daily_${1}_${DATE}"
 fi
 
