@@ -25,4 +25,14 @@ else
   INTERVAL=daily
 fi
 
-cd "$1/.." && /usr/local/sbin/ibs3 "--$INTERVAL" "$(basename "$1")"
+DIR="$(dirname "$1")"
+SRC="$(basename "$1")"
+
+cd "$DIR"
+
+if ls base_"$SRC"_*.snar &> /dev/null; then
+  /usr/local/sbin/ibs3 "--$INTERVAL" "$SRC"
+else
+  /usr/local/sbin/ibs3 "--base" "$SRC"
+fi
+
